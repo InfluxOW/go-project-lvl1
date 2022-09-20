@@ -3,7 +3,12 @@ package app
 import (
 	"math/rand"
 	"strconv"
+	"time"
 )
+
+func init() {
+	rand.Seed(time.Now().UnixNano())
+}
 
 type Game interface {
 	getGameName() string
