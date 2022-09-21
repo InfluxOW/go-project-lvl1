@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/prompter"
 	"math/rand"
@@ -11,6 +12,10 @@ import (
 const (
 	yesAnswer = "yes"
 	noAnswer  = "no"
+)
+
+var (
+	invalidNumberErr = errors.New("invalid number")
 )
 
 func init() {
@@ -53,13 +58,13 @@ func (g *EvenGame) getMission() string {
 
 func (g *EvenGame) prepareQuestionAndAnswer() {
 	n := int(rand.Int63n(1000))
-	a := noAnswer
+	answer := noAnswer
 	if isEven(n) {
-		a = yesAnswer
+		answer = yesAnswer
 	}
 
 	g.question = strconv.Itoa(n)
-	g.answer = a
+	g.answer = answer
 }
 
 func (g *EvenGame) askUserAnswer() string {
@@ -70,4 +75,57 @@ func (g *EvenGame) askUserAnswer() string {
 
 func isEven(n int) bool {
 	return n%2 == 0
+}
+
+type operation string
+
+const (
+	addition       operation = "+"
+	subtraction    operation = "-"
+	multiplication operation = "*"
+)
+
+var operations = []operation{addition, subtraction, multiplication}
+
+type CalcGame struct {
+	AbstractGame
+}
+
+func (g *CalcGame) getGameName() string {
+	return "calc"
+}
+
+func (g *CalcGame) getMission() string {
+	return "What is the result of the expression?"
+}
+
+func (g *CalcGame) prepareQuestionAndAnswer() {
+	a := int(rand.Int63n(50))
+	b := int(rand.Int63n(50))
+	op := operations[rand.Int63n(int64(len(operations)))]
+
+	var answer int
+	switch op {
+	case addition:
+		answer = a + b
+	case subtraction:
+		answer = a - b
+	case multiplication:
+		answer = a * b
+	}
+
+	g.question = fmt.Sprintf("%d %s %d", a, op, b)
+	g.answer = strconv.Itoa(answer)
+}
+
+func (g *CalcGame) askUserAnswer() string {
+	userAnswer, _ := prompter.Prompt(func(input string) error {
+		if _, err := strconv.Atoi(input); err != nil {
+			return invalidNumberErr
+		}
+
+		return nil
+	}).Run()
+
+	return userAnswer
 }
