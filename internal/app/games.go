@@ -15,6 +15,16 @@ const (
 )
 
 var (
+	numberValidator = func(input string) error {
+		if _, err := strconv.Atoi(input); err != nil {
+			return invalidNumberErr
+		}
+
+		return nil
+	}
+)
+
+var (
 	invalidNumberErr = errors.New("invalid number")
 )
 
@@ -119,13 +129,41 @@ func (g *CalcGame) prepareQuestionAndAnswer() {
 }
 
 func (g *CalcGame) askUserAnswer() string {
-	userAnswer, _ := prompter.Prompt(func(input string) error {
-		if _, err := strconv.Atoi(input); err != nil {
-			return invalidNumberErr
-		}
+	userAnswer, _ := prompter.Prompt(numberValidator).Run()
 
-		return nil
-	}).Run()
+	return userAnswer
+}
+
+type GcdGame struct {
+	AbstractGame
+}
+
+func (g *GcdGame) getGameName() string {
+	return "gcd"
+}
+
+func (g *GcdGame) getMission() string {
+	return "Find the greatest common divisor of given numbers."
+}
+
+func (g *GcdGame) prepareQuestionAndAnswer() {
+	a := int(rand.Int63n(100))
+	b := int(rand.Int63n(100))
+
+	g.question = fmt.Sprintf("%d, %d", a, b)
+	g.answer = strconv.Itoa(gcd(a, b))
+}
+
+func gcd(a int, b int) int {
+	if b == 0 {
+		return a
+	}
+
+	return gcd(b, a%b)
+}
+
+func (g *GcdGame) askUserAnswer() string {
+	userAnswer, _ := prompter.Prompt(numberValidator).Run()
 
 	return userAnswer
 }
