@@ -10,12 +10,11 @@ import (
 
 var (
 	invalidUsernameErr = errors.New("invalid username")
-	invalidGameErr     = errors.New("invalid game")
 )
 
 type Engine interface {
-	welcome() error
-	choose() (Game, error)
+	welcome()
+	choose() Game
 	play(game Game)
 }
 
@@ -25,7 +24,7 @@ type BrainGamesEngine struct {
 	username string
 }
 
-func (e *BrainGamesEngine) welcome() error {
+func (e *BrainGamesEngine) welcome() {
 	printer.PrintH1("Welcome to the Brain Games!")
 
 	printer.PrintInfo("May I have your name?..")
@@ -38,20 +37,15 @@ func (e *BrainGamesEngine) welcome() error {
 		return nil
 	})
 
-	username, _ := prompt.Run()
-	if err := prompt.Validate(username); err != nil {
-		return err
-	}
+	username := prompter.RunPrompt(prompt)
 
 	printer.PrintInfo(fmt.Sprintf("Hello, %s!", username))
 	fmt.Println()
 
 	e.username = username
-
-	return nil
 }
 
-func (e *BrainGamesEngine) choose() (Game, error) {
+func (e *BrainGamesEngine) choose() Game {
 	templates := &promptui.SelectTemplates{
 		Label:    "Available Games:",
 		Active:   fmt.Sprintf("%s {{ .GetName | green }}", promptui.IconSelect),
@@ -64,12 +58,9 @@ func (e *BrainGamesEngine) choose() (Game, error) {
 
 	prompt := prompter.Select("Game", Games, templates, true)
 
-	i, s, _ := prompt.Run()
-	if s == "" {
-		return nil, invalidGameErr
-	}
+	i, _ := prompter.RunSelect(prompt)
 
-	return Games[i], nil
+	return Games[i]
 }
 
 func (e *BrainGamesEngine) play(game Game) {

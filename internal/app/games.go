@@ -80,7 +80,8 @@ func (g *EvenGame) prepareQuestionAndAnswer() {
 }
 
 func (g *EvenGame) askUserAnswer() string {
-	_, userAnswer, _ := prompter.SimpleSelect([]string{yesAnswer, noAnswer}).Run()
+	prompt := prompter.SimpleSelect([]string{yesAnswer, noAnswer})
+	_, userAnswer := prompter.RunSelect(prompt)
 
 	return userAnswer
 }
@@ -131,9 +132,9 @@ func (g *CalcGame) prepareQuestionAndAnswer() {
 }
 
 func (g *CalcGame) askUserAnswer() string {
-	userAnswer, _ := prompter.Prompt(numberValidator).Run()
+	prompt := prompter.Prompt(numberValidator)
 
-	return userAnswer
+	return prompter.RunPrompt(prompt)
 }
 
 type GcdGame struct {
@@ -165,7 +166,7 @@ func gcd(a int, b int) int {
 }
 
 func (g *GcdGame) askUserAnswer() string {
-	userAnswer, _ := prompter.Prompt(numberValidator).Run()
+	prompt := prompter.Prompt(numberValidator)
 
-	return userAnswer
+	return prompter.RunPrompt(prompt)
 }

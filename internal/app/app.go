@@ -5,28 +5,34 @@ import (
 	osUtils "github.com/InfluxOW/go-project-lvl1/internal/utils/os"
 	"math/rand"
 	"os"
+	"os/signal"
+	"syscall"
 )
 
 func Play(random bool) {
+	gracefullyHandleShutdown()
+
 	engine := BrainGamesEngine{}
-	err := engine.welcome()
-	handleErr(err)
+	engine.welcome()
 
 	var game Game
 	if random {
 		game = Games[rand.Int63n(int64(len(Games)))]
 	} else {
-		g, err := engine.choose()
-		handleErr(err)
-
-		game = g
+		game = engine.choose()
 	}
+
 	engine.play(game)
+
+	os.Exit(osUtils.ExitCodeSuccess)
 }
 
-func handleErr(err error) {
-	if err != nil {
-		printer.PrintlnFailure(err.Error())
-		os.Exit(osUtils.ExitCodeError)
-	}
+func gracefullyHandleShutdown() {
+	c := make(chan os.Signal, 1)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGSTOP, syscall.SIGKILL, syscall.SIGTERM)
+	go func() {
+		<-c
+		printer.PrintlnInfo("See you later!")
+		os.Exit(osUtils.ExitCodeSuccess)
+	}()
 }
