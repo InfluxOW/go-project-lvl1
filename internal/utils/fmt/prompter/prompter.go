@@ -5,20 +5,26 @@ import (
 )
 
 const (
-	label = "Answer"
+	defaultLabel = "Answer"
 )
 
-func Select(items interface{}) *promptui.Select {
+func SimpleSelect(items interface{}) *promptui.Select {
+	return Select(defaultLabel, items, nil, false)
+}
+
+func Select(label string, items interface{}, templates *promptui.SelectTemplates, hideSelected bool) *promptui.Select {
 	return &promptui.Select{
-		Label:    label,
-		Items:    items,
-		HideHelp: true,
+		Label:        label,
+		Items:        items,
+		Templates:    templates,
+		HideHelp:     true,
+		HideSelected: hideSelected,
 	}
 }
 
 func Prompt(validate func(input string) error) *promptui.Prompt {
 	return &promptui.Prompt{
-		Label:    label,
+		Label:    defaultLabel,
 		Validate: validate,
 	}
 }

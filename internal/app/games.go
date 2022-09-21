@@ -9,6 +9,8 @@ import (
 	"time"
 )
 
+var Games []Game = []Game{&EvenGame{}, &GcdGame{}, &CalcGame{}}
+
 const (
 	yesAnswer = "yes"
 	noAnswer  = "no"
@@ -33,8 +35,8 @@ func init() {
 }
 
 type Game interface {
-	getGameName() string
-	getMission() string
+	GetName() string
+	GetMission() string
 	getQuestion() string
 	getAnswer() string
 	prepareQuestionAndAnswer()
@@ -58,11 +60,11 @@ type EvenGame struct {
 	AbstractGame
 }
 
-func (g *EvenGame) getGameName() string {
+func (g *EvenGame) GetName() string {
 	return "even"
 }
 
-func (g *EvenGame) getMission() string {
+func (g *EvenGame) GetMission() string {
 	return fmt.Sprintf("Answer '%s' if given number is even, otherwise answer '%s'.", yesAnswer, noAnswer)
 }
 
@@ -78,7 +80,7 @@ func (g *EvenGame) prepareQuestionAndAnswer() {
 }
 
 func (g *EvenGame) askUserAnswer() string {
-	_, userAnswer, _ := prompter.Select([]string{yesAnswer, noAnswer}).Run()
+	_, userAnswer, _ := prompter.SimpleSelect([]string{yesAnswer, noAnswer}).Run()
 
 	return userAnswer
 }
@@ -101,11 +103,11 @@ type CalcGame struct {
 	AbstractGame
 }
 
-func (g *CalcGame) getGameName() string {
+func (g *CalcGame) GetName() string {
 	return "calc"
 }
 
-func (g *CalcGame) getMission() string {
+func (g *CalcGame) GetMission() string {
 	return "What is the result of the expression?"
 }
 
@@ -138,11 +140,11 @@ type GcdGame struct {
 	AbstractGame
 }
 
-func (g *GcdGame) getGameName() string {
+func (g *GcdGame) GetName() string {
 	return "gcd"
 }
 
-func (g *GcdGame) getMission() string {
+func (g *GcdGame) GetMission() string {
 	return "Find the greatest common divisor of given numbers."
 }
 
