@@ -1,9 +1,16 @@
 package app
 
 import (
+	"fmt"
+	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/prompter"
 	"math/rand"
 	"strconv"
 	"time"
+)
+
+const (
+	yesAnswer = "yes"
+	noAnswer  = "no"
 )
 
 func init() {
@@ -16,6 +23,7 @@ type Game interface {
 	getQuestion() string
 	getAnswer() string
 	prepareQuestionAndAnswer()
+	askUserAnswer() string
 }
 
 type AbstractGame struct {
@@ -40,18 +48,24 @@ func (g *EvenGame) getGameName() string {
 }
 
 func (g *EvenGame) getMission() string {
-	return "Answer 'yes' if given number is even, otherwise answer 'no'."
+	return fmt.Sprintf("Answer '%s' if given number is even, otherwise answer '%s'.", yesAnswer, noAnswer)
 }
 
 func (g *EvenGame) prepareQuestionAndAnswer() {
 	n := int(rand.Int63n(1000))
-	a := "no"
+	a := noAnswer
 	if isEven(n) {
-		a = "yes"
+		a = yesAnswer
 	}
 
 	g.question = strconv.Itoa(n)
 	g.answer = a
+}
+
+func (g *EvenGame) askUserAnswer() string {
+	_, userAnswer, _ := prompter.Select([]string{yesAnswer, noAnswer}).Run()
+
+	return userAnswer
 }
 
 func isEven(n int) bool {

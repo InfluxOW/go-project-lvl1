@@ -1,6 +1,15 @@
 package app
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/printer"
+	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/prompter"
+)
+
+var (
+	invalidUsernameErr = errors.New("invalid username")
+)
 
 type Engine interface {
 	play(game Game)
@@ -15,40 +24,49 @@ type BrainGamesEngine struct {
 }
 
 func (e *BrainGamesEngine) welcome() {
-	fmt.Println("Welcome to the Brain Games!")
-	fmt.Println("May I have your name?")
-	var username string
-	fmt.Scan(&username)
-	fmt.Println(fmt.Sprintf("Hello, %s!", username))
+	printer.PrintH1("Welcome to the Brain Games!")
+
+	printer.PrintInfo("May I have your name?..")
+
+	prompt := prompter.Prompt(func(input string) error {
+		if len(input) < 2 {
+			return invalidUsernameErr
+		}
+
+		return nil
+	})
+
+	username, _ := prompt.Run()
+	printer.PrintInfo(fmt.Sprintf("Hello, %s!", username))
 	fmt.Println()
 
 	e.username = username
 }
 
 func (e *BrainGamesEngine) play(game Game) {
-	fmt.Println(fmt.Sprintf("(!!!) Game mission: %s", game.getMission()))
-	fmt.Println()
+	printer.PrintH2(game.getMission(), "Game mission:")
 
 	for rc := 1; rc <= roundsCount; rc++ {
 		game.prepareQuestionAndAnswer()
 
-		fmt.Println(fmt.Sprintf("Question: %s", game.getQuestion()))
-		fmt.Println("Your answer...")
-		var userAnswer string
-		fmt.Scan(&userAnswer)
+		printer.PrintH3(game.getQuestion(), "Question:")
+
+		userAnswer := game.askUserAnswer()
 		correctAnswer := game.getAnswer()
 
 		if userAnswer == correctAnswer {
-			fmt.Println("Correct!")
-		} else {
-			fmt.Println(fmt.Sprintf("'%s' is wrong answer ;(. Correct answer was '%s'", userAnswer, correctAnswer))
-			fmt.Println(fmt.Sprintf("Let's try again, %s!", e.username))
+			printer.PrintSuccess("Correct!")
+			fmt.Println()
 
-			return
+			continue
 		}
 
+		printer.PrintFailure(fmt.Sprintf("'%s' is wrong answer ;(. Correct answer was '%s'", userAnswer, correctAnswer))
 		fmt.Println()
+		printer.PrintlnFailure(fmt.Sprintf("Let's try again, %s!", e.username))
+
+		return
 	}
 
-	fmt.Println(fmt.Sprintf("Congratulations, %s!", e.username))
+	printer.PrintlnSuccess(fmt.Sprintf("Congratulations, %s!", e.username))
 }
