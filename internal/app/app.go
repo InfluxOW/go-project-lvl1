@@ -12,17 +12,11 @@ import (
 func Play(random bool) {
 	gracefullyHandleShutdown()
 
-	engine := BrainGamesEngine{}
-	engine.welcome()
+	e := chooseEngine()
+	e.welcome()
 
-	var game Game
-	if random {
-		game = Games[rand.Int63n(int64(len(Games)))]
-	} else {
-		game = engine.choose()
-	}
-
-	engine.play(game)
+	g := chooseGame(random, e)
+	e.play(g)
 
 	os.Exit(osUtils.ExitCodeSuccess)
 }
@@ -35,4 +29,21 @@ func gracefullyHandleShutdown() {
 		printer.PrintlnInfo("See you later!")
 		os.Exit(osUtils.ExitCodeSuccess)
 	}()
+}
+
+func chooseEngine() engine {
+	e := brainGamesEngine{}
+
+	return &e
+}
+
+func chooseGame(random bool, e engine) game {
+	var g game
+	if random {
+		g = games[rand.Int63n(int64(len(games)))]
+	} else {
+		g = e.choose()
+	}
+
+	return g
 }

@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var Games []Game = []Game{&EvenGame{}, &GcdGame{}, &CalcGame{}}
+var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}}
 
 const (
 	yesAnswer = "yes"
@@ -34,7 +34,7 @@ func init() {
 	rand.Seed(time.Now().UnixNano())
 }
 
-type Game interface {
+type game interface {
 	GetName() string
 	GetMission() string
 	getQuestion() string
@@ -43,32 +43,32 @@ type Game interface {
 	askUserAnswer() string
 }
 
-type AbstractGame struct {
+type abstractGame struct {
 	question string
 	answer   string
 }
 
-func (g *AbstractGame) getQuestion() string {
+func (g *abstractGame) getQuestion() string {
 	return g.question
 }
 
-func (g *AbstractGame) getAnswer() string {
+func (g *abstractGame) getAnswer() string {
 	return g.answer
 }
 
-type EvenGame struct {
-	AbstractGame
+type evenGame struct {
+	abstractGame
 }
 
-func (g *EvenGame) GetName() string {
+func (g *evenGame) GetName() string {
 	return "even"
 }
 
-func (g *EvenGame) GetMission() string {
+func (g *evenGame) GetMission() string {
 	return fmt.Sprintf("Answer '%s' if given number is even, otherwise answer '%s'.", yesAnswer, noAnswer)
 }
 
-func (g *EvenGame) prepareQuestionAndAnswer() {
+func (g *evenGame) prepareQuestionAndAnswer() {
 	n := int(rand.Int63n(1000))
 	answer := noAnswer
 	if isEven(n) {
@@ -79,7 +79,7 @@ func (g *EvenGame) prepareQuestionAndAnswer() {
 	g.answer = answer
 }
 
-func (g *EvenGame) askUserAnswer() string {
+func (g *evenGame) askUserAnswer() string {
 	prompt := prompter.SimpleSelect([]string{yesAnswer, noAnswer})
 	_, userAnswer := prompter.RunSelect(prompt)
 
@@ -100,19 +100,19 @@ const (
 
 var operations = []operation{addition, subtraction, multiplication}
 
-type CalcGame struct {
-	AbstractGame
+type calcGame struct {
+	abstractGame
 }
 
-func (g *CalcGame) GetName() string {
+func (g *calcGame) GetName() string {
 	return "calc"
 }
 
-func (g *CalcGame) GetMission() string {
+func (g *calcGame) GetMission() string {
 	return "What is the result of the expression?"
 }
 
-func (g *CalcGame) prepareQuestionAndAnswer() {
+func (g *calcGame) prepareQuestionAndAnswer() {
 	a := int(rand.Int63n(50))
 	b := int(rand.Int63n(50))
 	op := operations[rand.Int63n(int64(len(operations)))]
@@ -131,25 +131,25 @@ func (g *CalcGame) prepareQuestionAndAnswer() {
 	g.answer = strconv.Itoa(answer)
 }
 
-func (g *CalcGame) askUserAnswer() string {
+func (g *calcGame) askUserAnswer() string {
 	prompt := prompter.Prompt(numberValidator)
 
 	return prompter.RunPrompt(prompt)
 }
 
-type GcdGame struct {
-	AbstractGame
+type gcdGame struct {
+	abstractGame
 }
 
-func (g *GcdGame) GetName() string {
+func (g *gcdGame) GetName() string {
 	return "gcd"
 }
 
-func (g *GcdGame) GetMission() string {
+func (g *gcdGame) GetMission() string {
 	return "Find the greatest common divisor of given numbers."
 }
 
-func (g *GcdGame) prepareQuestionAndAnswer() {
+func (g *gcdGame) prepareQuestionAndAnswer() {
 	a := int(rand.Int63n(100))
 	b := int(rand.Int63n(100))
 
@@ -165,7 +165,7 @@ func gcd(a int, b int) int {
 	return gcd(b, a%b)
 }
 
-func (g *GcdGame) askUserAnswer() string {
+func (g *gcdGame) askUserAnswer() string {
 	prompt := prompter.Prompt(numberValidator)
 
 	return prompter.RunPrompt(prompt)

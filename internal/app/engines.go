@@ -12,20 +12,20 @@ var (
 	invalidUsernameErr = errors.New("invalid username")
 )
 
-type Engine interface {
+type engine interface {
 	welcome()
-	choose() Game
-	play(game Game)
+	choose() game
+	play(game game)
 }
 
 const roundsCount = 3
 
-type BrainGamesEngine struct {
+type brainGamesEngine struct {
 	username string
 }
 
-func (e *BrainGamesEngine) welcome() {
-	printer.PrintH1("Welcome to the Brain Games!")
+func (e *brainGamesEngine) welcome() {
+	printer.PrintH1("Welcome to the Brain games!")
 
 	printer.PrintInfo("May I have your name?..")
 
@@ -45,9 +45,9 @@ func (e *BrainGamesEngine) welcome() {
 	e.username = username
 }
 
-func (e *BrainGamesEngine) choose() Game {
+func (e *brainGamesEngine) choose() game {
 	templates := &promptui.SelectTemplates{
-		Label:    "Available Games:",
+		Label:    "Available games:",
 		Active:   fmt.Sprintf("%s {{ .GetName | green }}", promptui.IconSelect),
 		Inactive: "  {{ .GetName | red }}",
 		Selected: fmt.Sprintf(`{{ "%s" | green }} {{ .GetName | faint }}`, promptui.IconGood),
@@ -56,15 +56,15 @@ func (e *BrainGamesEngine) choose() Game {
 {{ "Mission:" | faint }}	{{ .GetMission }}`,
 	}
 
-	prompt := prompter.Select("Game", Games, templates, true)
+	prompt := prompter.Select("Game", games, templates, true)
 
 	i, _ := prompter.RunSelect(prompt)
 
-	return Games[i]
+	return games[i]
 }
 
-func (e *BrainGamesEngine) play(game Game) {
-	printer.PrintH2(game.GetMission(), "Game mission:")
+func (e *brainGamesEngine) play(game game) {
+	printer.PrintH2(game.GetMission(), "Game Mission:")
 
 	for rc := 1; rc <= roundsCount; rc++ {
 		game.prepareQuestionAndAnswer()

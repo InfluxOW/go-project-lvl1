@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"github.com/InfluxOW/go-project-lvl1/internal/app"
-
 	"github.com/spf13/cobra"
 )
 
