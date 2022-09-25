@@ -9,6 +9,8 @@ import (
 	"syscall"
 )
 
+var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}, &primeGame{}, &rootGame{}}
+
 func Play(random bool) {
 	gracefullyHandleShutdown()
 

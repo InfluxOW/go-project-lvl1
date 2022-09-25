@@ -11,8 +11,6 @@ import (
 	"time"
 )
 
-var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}, &primeGame{}, &rootGame{}}
-
 const (
 	yesAnswer = "yes"
 	noAnswer  = "no"
