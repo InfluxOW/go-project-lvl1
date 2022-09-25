@@ -4,13 +4,14 @@ import (
 	"errors"
 	"fmt"
 	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/prompter"
+	"math"
 	"math/rand"
 	"strconv"
 	"strings"
 	"time"
 )
 
-var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}, &primeGame{}}
+var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}, &primeGame{}, &rootGame{}}
 
 const (
 	yesAnswer = "yes"
@@ -269,4 +270,29 @@ func (g *primeGame) askUserAnswer() string {
 	_, userAnswer := prompter.RunSelect(prompt)
 
 	return userAnswer
+}
+
+type rootGame struct {
+	abstractGame
+}
+
+func (g *rootGame) GetName() string {
+	return "root"
+}
+
+func (g *rootGame) GetMission() string {
+	return "Find an integer whose square is closest to the given one."
+}
+
+func (g *rootGame) prepareQuestionAndAnswer() {
+	n := int(rand.Int63n(1000))
+
+	g.question = strconv.Itoa(n)
+	g.answer = strconv.Itoa(int(math.Sqrt(float64(n))))
+}
+
+func (g *rootGame) askUserAnswer() string {
+	prompt := prompter.Prompt(numberValidator)
+
+	return prompter.RunPrompt(prompt)
 }
