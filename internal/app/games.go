@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}}
+var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}, &primeGame{}}
 
 const (
 	yesAnswer = "yes"
@@ -225,4 +225,48 @@ func (g *progressionGame) askUserAnswer() string {
 	prompt := prompter.Prompt(numberValidator)
 
 	return prompter.RunPrompt(prompt)
+}
+
+type primeGame struct {
+	abstractGame
+}
+
+func (g *primeGame) GetName() string {
+	return "prime"
+}
+
+func (g *primeGame) GetMission() string {
+	return fmt.Sprintf("Answer '%s' if given number is even, otherwise answer '%s'.", yesAnswer, noAnswer)
+}
+
+func (g *primeGame) prepareQuestionAndAnswer() {
+	n := int(rand.Int63n(100))
+	a := noAnswer
+	if isPrime(n) {
+		a = yesAnswer
+	}
+
+	g.question = strconv.Itoa(n)
+	g.answer = a
+}
+
+func isPrime(n int) bool {
+	if n <= 1 {
+		return false
+	}
+
+	for start := 2; start <= n; start++ {
+		if n%start == 0 {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (g *primeGame) askUserAnswer() string {
+	prompt := prompter.SimpleSelect([]string{yesAnswer, noAnswer})
+	_, userAnswer := prompter.RunSelect(prompt)
+
+	return userAnswer
 }
