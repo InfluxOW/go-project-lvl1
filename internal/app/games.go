@@ -6,10 +6,11 @@ import (
 	"github.com/InfluxOW/go-project-lvl1/internal/utils/fmt/prompter"
 	"math/rand"
 	"strconv"
+	"strings"
 	"time"
 )
 
-var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}}
+var games = []game{&evenGame{}, &gcdGame{}, &calcGame{}, &progressionGame{}}
 
 const (
 	yesAnswer = "yes"
@@ -166,6 +167,61 @@ func gcd(a int, b int) int {
 }
 
 func (g *gcdGame) askUserAnswer() string {
+	prompt := prompter.Prompt(numberValidator)
+
+	return prompter.RunPrompt(prompt)
+}
+
+type progressionGame struct {
+	abstractGame
+}
+
+func (g *progressionGame) GetName() string {
+	return "progression"
+}
+
+func (g *progressionGame) GetMission() string {
+	return "What number is missing in the progression?"
+}
+
+func (g *progressionGame) prepareQuestionAndAnswer() {
+	const progressionLength = 10
+
+	step := int(rand.Int63n(100))
+	progressionStart := int(rand.Int63n(100))
+	progression := generateProgression(step, progressionStart, progressionLength)
+	hiddenElementIndex := int(rand.Int63n(progressionLength))
+
+	g.question = getProgressionWithHiddenElementString(progression, hiddenElementIndex)
+	g.answer = strconv.Itoa(progression[hiddenElementIndex])
+}
+
+func getProgressionWithHiddenElementString(progression []int, hiddenElementIndex int) string {
+	var prStr []string
+	for i, n := range progression {
+		var str string
+		if i == hiddenElementIndex {
+			str = "?"
+		} else {
+			str = strconv.Itoa(n)
+		}
+
+		prStr = append(prStr, str)
+	}
+
+	return strings.Join(prStr, ", ")
+}
+
+func generateProgression(step, start, length int) []int {
+	var pr []int
+	for i := 0; i <= length; i++ {
+		pr = append(pr, start+step*i)
+	}
+
+	return pr
+}
+
+func (g *progressionGame) askUserAnswer() string {
 	prompt := prompter.Prompt(numberValidator)
 
 	return prompter.RunPrompt(prompt)
